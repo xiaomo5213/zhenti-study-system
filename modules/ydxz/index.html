@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>阅读选择 · 在线练习</title>
+    <style>
+        /* 防止移动端双击朗读图标/按钮触发页面缩放 */
+        body, button, .speaker, .opt, select, input {
+            touch-action: manipulation;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f5f7fa;
+            padding: 16px;
+            color: #1e2a3a;
+        }
+        .app {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+            padding: 20px;
+        }
+        h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #0b2b4a;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .subhead {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e9edf4;
+            padding-bottom: 12px;
+        }
+        .subhead span {
+            color: #4a5b6e;
+            font-size: 0.95rem;
+            background: #eef2f8;
+            padding: 6px 14px;
+            border-radius: 40px;
+        }
+        .main-panel {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+        .left-col { flex: 6; min-width: 300px; }
+        .right-col { flex: 4; min-width: 300px; }
+
+        /* ===== 文章卡片 ===== */
+        .article-card {
+            background: #fbfdff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e2e9f2;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.02);
+            position: sticky;
+            top: 20px;
+        }
+        .article-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .article-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #0d2e4e;
+        }
+
+        /* ===== 控制区：翻译按钮 + 音色选择 ===== */
+        .article-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        .translate-btn {
+            background: #eef3fe;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-weight: 500;
+            color: #1a4c8c;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            box-shadow: 0 2px 6px rgba(0, 70, 150, 0.08);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .translate-btn:hover { background: #d9e6ff; }
+        .translate-btn.active {
+            background: #1f4e8c;
+            color: white;
+        }
+
+        /* ===== 音色选择下拉框 ===== */
+        .voice-select {
+            background: #ffffff;
+            border: 1px solid #cfd9e6;
+            padding: 9px 14px;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            color: #1e3e6e;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%231e3e6e%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 10px;
+            padding-right: 32px;
+            max-width: 180px;
+        }
+        .voice-select:focus { border-color: #1f4e8c; }
+
+        /* 段落背景色 */
+        .para-block {
+            margin-bottom: 18px;
+            border-radius: 16px;
+            padding: 14px 16px;
+            transition: background 0.2s;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+        .para-block:last-child { margin-bottom: 0; }
+        .para-1 { background: #fef9e7; }
+        .para-2 { background: #e8f6ef; }
+        .para-3 { background: #f3e8fd; }
+        .para-4 { background: #fde9e9; }
+        .para-5 { background: #e6f2fc; }
+
+        .para-block .eng-text {
+            display: block;
+            word-break: break-word;
+        }
+        .sentence-block { margin-bottom: 10px; }
+        .sentence-block:last-child { margin-bottom: 0; }
+        .sentence-line {
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .eng-sentence-text { flex: 1; min-width: 0; }
+        .speaker {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #e1eaf6;
+            border-radius: 50%;
+            color: #1e4b8a;
+            font-size: 13px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: background 0.2s;
+            user-select: none;
+            vertical-align: middle;
+            margin-left: 6px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .speaker:hover { background: #c2d6f0; }
+        .speaker.speaking { background: #1f4e8c; color: #fff; }
+        .speaker.loading { background: #ffe8a3; }
+        .trans-text {
+            color: #2d4f7c;
+            font-size: 0.92rem;
+            margin-top: 4px;
+            display: block;
+            border-left: 3px solid #b8cce4;
+            padding-left: 12px;
+            margin-left: 0;
+            font-style: normal;
+        }
+        .highlight-source {
+            background-color: #fff3bf !important;
+            box-shadow: 0 0 0 2px #f0d77b;
+            border-radius: 6px;
+            padding: 2px 4px;
+            margin: 0 -4px;
+        }
+        .sentence-line.highlight-source { padding: 4px 6px; }
+
+        /* ===== 试题卡片 ===== */
+        .quiz-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid #e2e9f2;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+        }
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .quiz-header h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #0d2e4e;
+        }
+        .quiz-header .info-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .quiz-header .info-tags span {
+            background: #eef3fc;
+            color: #1b3b63;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.78rem;
+            font-weight: 500;
+        }
+
+        .question-wrapper {
+            margin-bottom: 16px;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .match-item {
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid #e4ecf5;
+            transition: background 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .match-item .q-row {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .match-item .q-label {
+            font-weight: 600;
+            color: #0e2f50;
+            background: rgba(255,255,255,0.7);
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.82rem;
+            flex-shrink: 0;
+        }
+        .match-item .q-text {
+            font-weight: 500;
+            color: #1a2a3a;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+        .options { display: flex; flex-direction: column; gap: 8px; }
+        .opt {
+            background: #ffffff;
+            border: 1px solid #cfdcec;
+            padding: 10px 16px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            color: #1f3d60;
+            cursor: pointer;
+            transition: all 0.12s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            text-align: left;
+            line-height: 1.5;
+        }
+        .opt.selected {
+            background: #1f4e8c;
+            border-color: #1f4e8c;
+            color: white;
+            box-shadow: 0 4px 8px rgba(31, 78, 140, 0.2);
+        }
+        .opt:active { transform: scale(0.99); }
+        .opt.disabled { opacity: 0.7; pointer-events: none; }
+
+        .explain-inline {
+            margin-top: 8px;
+            padding: 10px 14px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            border: 1px solid #e4ecf5;
+            width: 100%;
+        }
+        .explain-inline .ans-line {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+            font-weight: 500;
+        }
+        .explain-inline .ans-icon { font-size: 1.1rem; }
+        .explain-inline .ans-tag {
+            background: rgba(217,235,247,0.85);
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: 0.82rem;
+            color: #1b4f72;
+        }
+        .explain-inline .correct-answer { color: #1a6f3c; font-weight: 600; }
+        .explain-inline .wrong-answer { color: #b13e3e; font-weight: 600; }
+        .explain-inline .ans-detail { color: #3a5a7a; margin-top: 4px; }
+
+        .source-btn {
+            background: rgba(232,240,250,0.9);
+            border: 1px solid #b8cde0;
+            padding: 5px 16px;
+            border-radius: 40px;
+            font-size: 0.83rem;
+            font-weight: 500;
+            color: #136b9c;
+            cursor: pointer;
+            transition: all 0.15s;
+            margin-top: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .source-btn:active { background: #d0e2f2; }
+        .source-btn.active {
+            background: #136b9c;
+            color: white;
+            border-color: #136b9c;
+        }
+
+        .q-color-1  { background: #fef9e7; border-color: #f0e0b0; }
+        .q-color-2  { background: #e8f6ef; border-color: #b8dfc8; }
+        .q-color-3  { background: #f3e8fd; border-color: #d9bdf0; }
+        .q-color-4  { background: #fde9e9; border-color: #f0bfbf; }
+        .q-color-5  { background: #e6f2fc; border-color: #b8d4ee; }
+
+        .submit-area {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+        .submit-btn {
+            background: #1f4e8c;
+            color: white;
+            border: none;
+            padding: 12px 32px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 8px 18px rgba(31, 78, 140, 0.2);
+            transition: background 0.2s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .submit-btn:hover { background: #123b6b; }
+        .submit-btn.reset { background: #5b7f9c; box-shadow: 0 8px 18px rgba(91, 127, 156, 0.2); }
+        .submit-btn.reset:hover { background: #466a87; }
+        .score-box {
+            background: #e8f0fe;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: 600;
+            color: #1a3e70;
+        }
+
+        .pager-bottom {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+            margin-top: 30px;
+            padding: 16px 0 8px;
+            flex-wrap: wrap;
+            border-top: 1px solid #e9edf4;
+        }
+        .pager-bottom button {
+            background: #ffffff;
+            border: 1px solid #cfd9e6;
+            padding: 10px 24px;
+            border-radius: 40px;
+            font-weight: 500;
+            color: #1e3e6e;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 0.95rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pager-bottom button:hover:not(:disabled) {
+            background: #e8f0fe;
+            border-color: #3b7fc4;
+        }
+        .pager-bottom button:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .pager-bottom input {
+            width: 70px;
+            text-align: center;
+            padding: 10px 6px;
+            border: 1px solid #cfd9e6;
+            border-radius: 40px;
+            font-size: 0.95rem;
+            background: white;
+            -moz-appearance: textfield;
+        }
+        .pager-bottom input::-webkit-outer-spin-button,
+        .pager-bottom input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .footnote {
+            margin-top: 16px;
+            font-size: 0.8rem;
+            color: #7a8b9f;
+            text-align: center;
+        }
+        .page-loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #4a5b6e;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 800px) {
+            .main-panel { flex-direction: column; }
+            .article-card { position: static; }
+            .app { padding: 14px; }
+            .pager-bottom { gap: 10px; }
+            .pager-bottom button { padding: 8px 16px; font-size: 0.85rem; }
+            .pager-bottom input { width: 55px; padding: 8px 4px; }
+            .opt { padding: 10px 14px; font-size: 0.88rem; }
+            /* 手机端：标题、按钮、下拉框换行 */
+            .article-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .article-controls {
+                width: 100%;
+                justify-content: flex-start;
+            }
+            .voice-select {
+                max-width: 100%;
+                flex: 1;
+                min-width: 130px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="lecture-core.css">
+    <!-- ===== 撷墨真题学习系统 · 外壳样式（统一顶部导航） ===== -->
+    <script>document.documentElement.className += " xt-shell";</script>
+    <link rel="stylesheet" href="../../_sys/sys.css">
+    <link rel="stylesheet" href="../../_sys/dict.css">
+    <link rel="icon" type="image/svg+xml" href="../../_sys/favicon.svg">
+</head>
+<body>
+<div class="app" id="app">
+    <div class="page-loading">⏳ 正在加载题库...</div>
+</div>
+
+<!-- 引入数据文件（先翻译后题库） -->
+<script src="lecture-core.js"></script>
+<script src="translations.js"></script>
+<script src="data.js"></script>
+
+<script>
+    // ========== 配置你的 Edge TTS Worker 地址 ==========
+    const TTS_WORKER_URL = 'https://api.xiemojy.mom/v1/audio/speech';
+    const USE_TTS_WORKER = true; // 使用 Cloudflare Worker 合成音频
+
+    // 默认音色（英文）：美式女声 Jenny
+    const DEFAULT_VOICE = 'en-US-AvaMultilingualNeural';
+    const VOICE_STORAGE_KEY = 'tts_voice_preference_reading_select';
+
+    let examsData = [];
+    let currentPage = 0;
+    let userAnswers = [];
+    let submitted = [];
+    let translateOn = [];
+    let activeSourceIndex = null;
+    let currentSpeakBtn = null;
+    let globalAudio = null;
+    let audioUnlocked = false;
+
+    const app = document.getElementById('app');
+
+    // ========== 音色选择（持久化） ==========
+    function loadVoicePreference() {
+        try {
+            const saved = localStorage.getItem(VOICE_STORAGE_KEY);
+            return saved || DEFAULT_VOICE;
+        } catch (e) {
+            return DEFAULT_VOICE;
+        }
+    }
+    function saveVoicePreference(v) {
+        try { localStorage.setItem(VOICE_STORAGE_KEY, v); } catch (e) {}
+    }
+
+    function initState() {
+        userAnswers = examsData.map(exam => Array(exam.questions.length).fill(null));
+        submitted = examsData.map(() => false);
+        translateOn = examsData.map(() => false);
+    }
+
+    function getGlobalAudio() {
+        if (!globalAudio) {
+            globalAudio = new Audio();
+            globalAudio.preload = 'auto';
+            globalAudio.setAttribute('playsinline', 'true');
+            globalAudio.setAttribute('webkit-playsinline', 'true');
+        }
+        return globalAudio;
+    }
+
+    function stopSpeech() {
+        if (globalAudio) {
+            try {
+                globalAudio.pause();
+                globalAudio.currentTime = 0;
+            } catch (e) {}
+        }
+        if (currentSpeakBtn) {
+            currentSpeakBtn.classList.remove('speaking');
+            currentSpeakBtn.classList.remove('loading');
+            currentSpeakBtn = null;
+        }
+        if ('speechSynthesis' in window) {
+            try { window.speechSynthesis.cancel(); } catch (e) {}
+        }
+    }
+
+    // 必须在用户点击手势内同步调用，否则异步请求回来后浏览器会拒绝自动播放
+    function unlockAudio() {
+        if (audioUnlocked) return;
+        try {
+            const audio = getGlobalAudio();
+            audio.volume = 0;
+            audio.src = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=';
+            const p = audio.play();
+            if (p && p.catch) p.catch(() => {});
+            audio.volume = 1;
+            audioUnlocked = true;
+        } catch (e) { /* 忽略 */ }
+    }
+
+    async function speakText(text, btnEl) {
+        if (currentSpeakBtn === btnEl && globalAudio && !globalAudio.paused) {
+            stopSpeech();
+            return;
+        }
+        stopSpeech();
+
+        if (btnEl) {
+            btnEl.classList.add('loading');
+            currentSpeakBtn = btnEl;
+        }
+
+        // 超时控制：TTS 无响应时不再无限等待
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+        if (USE_TTS_WORKER) {
+            try {
+                const voice = loadVoicePreference();
+                const response = await fetch(TTS_WORKER_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        input: text,
+                        voice: voice,
+                        speed: 0.95
+                    }),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+                if (!response.ok) throw new Error(`TTS 请求失败: ${response.status}`);
+                const arrayBuffer = await response.arrayBuffer();
+                const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+                const audioUrl = URL.createObjectURL(blob);
+                const audio = getGlobalAudio();
+                audio.src = audioUrl;
+
+                if (btnEl) {
+                    btnEl.classList.remove('loading');
+                    btnEl.classList.add('speaking');
+                }
+
+                audio.onended = null;
+                audio.onerror = null;
+
+                audio.onended = () => {
+                    if (btnEl) btnEl.classList.remove('speaking');
+                    if (currentSpeakBtn === btnEl) currentSpeakBtn = null;
+                    URL.revokeObjectURL(audioUrl);
+                };
+                audio.onerror = () => {
+                    if (btnEl) btnEl.classList.remove('speaking');
+                    if (currentSpeakBtn === btnEl) currentSpeakBtn = null;
+                    URL.revokeObjectURL(audioUrl);
+                };
+
+                try {
+                    await audio.play();
+                    audioUnlocked = true;
+                } catch (playErr) {
+                    console.error('播放失败:', playErr);
+                    if (btnEl) btnEl.classList.remove('speaking');
+                    currentSpeakBtn = null;
+                    URL.revokeObjectURL(audioUrl);
+                    if (!audioUnlocked) {
+                        alert('请再点击一次发音按钮（微信需激活音频权限）');
+                    }
+                }
+                return;
+            } catch (err) {
+                clearTimeout(timeoutId);
+                console.error('Worker TTS 失败，回退到内置语音:', err);
+                if (btnEl) btnEl.classList.remove('loading');
+            }
+        } else {
+            clearTimeout(timeoutId);
+        }
+
+        // 回退到浏览器内置语音
+        if ('speechSynthesis' in window) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.9;
+            utterance.onstart = () => {
+                if (btnEl) {
+                    btnEl.classList.remove('loading');
+                    btnEl.classList.add('speaking');
+                }
+            };
+            utterance.onend = () => {
+                if (btnEl) btnEl.classList.remove('speaking');
+                if (currentSpeakBtn === btnEl) currentSpeakBtn = null;
+            };
+            utterance.onerror = () => {
+                if (btnEl) btnEl.classList.remove('speaking');
+                if (currentSpeakBtn === btnEl) currentSpeakBtn = null;
+            };
+            try { window.speechSynthesis.cancel(); } catch (e) {}
+            window.speechSynthesis.speak(utterance);
+        } else {
+            if (btnEl) btnEl.classList.remove('loading');
+            alert('您的浏览器不支持语音朗读。');
+        }
+    }
+
+    // ========== 渲染 ==========
+    function render() {
+        if (!examsData.length) {
+            app.innerHTML = '<div class="page-loading">⚠️ 题库数据为空，请检查 data.js</div>';
+            return;
+        }
+        const exam = examsData[currentPage];
+        const isSubmitted = submitted[currentPage];
+        const translationOn = translateOn[currentPage];
+
+        let correctCount = 0;
+        exam.questions.forEach((q, idx) => {
+            if (userAnswers[currentPage][idx] === q.answer) correctCount++;
+        });
+        const score = correctCount * 2;
+        const totalScore = exam.questions.length * 2;
+
+        let highlightText = '';
+        if (isSubmitted && activeSourceIndex !== null) {
+            const q = exam.questions[activeSourceIndex];
+            if (q && q.sourceSentence) highlightText = q.sourceSentence.trim();
+        }
+
+        // ========== 左侧文章 ==========
+        let articleHtml = '';
+        articleHtml += `<div class="article-header">`;
+        articleHtml += `<h2 id="articleTitle">${exam.articleTitle || exam.session}</h2>`;
+        articleHtml += `<div class="article-controls">`;
+        articleHtml += `<button class="lecture-enter-btn" id="lectureBtn" onclick="openLecture()">🎧 讲解模式</button>`;
+        articleHtml += `<button class="translate-btn ${translationOn ? 'active' : ''}" id="translateBtn">🌐 ${translationOn ? '隐藏翻译' : '全文翻译'}</button>`;
+        articleHtml += `<select class="voice-select" id="voiceSelect" style="display:${translationOn ? '' : 'none'};" title="选择发音音色">`;
+        articleHtml += `<optgroup label="多语言（中英混读·推荐）">`;
+        articleHtml += `<option value="en-US-AvaMultilingualNeural">🌐 Ava 多语言</option>`;
+        articleHtml += `<option value="en-US-EmmaMultilingualNeural">🌐 Emma 多语言</option>`;
+        articleHtml += `<option value="en-US-AndrewMultilingualNeural">🌐 Andrew 多语言</option>`;
+        articleHtml += `<option value="en-US-BrianMultilingualNeural">🌐 Brian 多语言</option>`;
+        articleHtml += `<option value="zh-CN-XiaoxiaoMultilingualNeural">🌐 晓晓 多语言</option>`;
+        articleHtml += `<option value="zh-CN-XiaochenMultilingualNeural">🌐 晓辰 多语言</option>`;
+        articleHtml += `<option value="zh-CN-XiaoyuMultilingualNeural">🌐 晓宇 多语言</option>`;
+        articleHtml += `<option value="zh-CN-YunyiMultilingualNeural">🌐 云希 多语言</option>`;
+        articleHtml += `</optgroup>`;
+        articleHtml += `<optgroup label="纯英文（仅读英文）">`;
+        articleHtml += `<option value="en-US-JennyNeural">👩 美式女声 Jenny</option>`;
+        articleHtml += `<option value="en-US-AriaNeural">👩 美式女声 Aria</option>`;
+        articleHtml += `<option value="en-US-GuyNeural">👨 美式男声 Guy</option>`;
+        articleHtml += `<option value="en-GB-SoniaNeural">👩 英式女声 Sonia</option>`;
+        articleHtml += `<option value="en-GB-RyanNeural">👨 英式男声 Ryan</option>`;
+        articleHtml += `<option value="en-AU-NatashaNeural">👩 澳式女声 Natasha</option>`;
+        articleHtml += `</optgroup>`;
+        articleHtml += `</select>`;
+        articleHtml += `</div>`;
+        articleHtml += `</div>`;
+
+        const translationDict = (typeof translationsMap !== 'undefined' && translationsMap[exam.session]) || {};
+
+        exam.articleParas.forEach((p, pIdx) => {
+            const colorClass = `para-${(pIdx % 5) + 1}`;
+            articleHtml += `<div class="para-block ${colorClass}">`;
+
+            if (translationOn) {
+                const sentences = p.text.match(/[^.!?]+[.!?]*/g) || [p.text];
+                sentences.forEach((sentence) => {
+                    const trimmed = sentence.trim();
+                    if (!trimmed) return;
+                    const isHighlight = highlightText && (
+                        trimmed.includes(highlightText) || highlightText.includes(trimmed)
+                    );
+                    const translation = translationDict[trimmed] || '';
+                    articleHtml += `<div class="sentence-block">`;
+                    articleHtml += `<div class="sentence-line ${isHighlight ? 'highlight-source' : ''}">`;
+                    articleHtml += `<span class="eng-sentence-text">${trimmed}</span>`;
+                    articleHtml += `<span class="speaker" data-text="${encodeURIComponent(trimmed)}" title="发音"><svg viewBox="0 0 24 24" width="13" height="13" style="display:block" fill="currentColor" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3z"/><path d="M16 8.6a5 5 0 0 1 0 6.8M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>`;
+                    articleHtml += `</div>`;
+                    if (translation) {
+                        articleHtml += `<div class="trans-text">${translation}</div>`;
+                    }
+                    articleHtml += `</div>`;
+                });
+            } else {
+                let paraText = p.text;
+                if (highlightText) {
+                    const escapedSource = highlightText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(`(${escapedSource})`, 'g');
+                    if (regex.test(paraText)) {
+                        paraText = paraText.replace(regex, '<span class="highlight-source">$1</span>');
+                    }
+                }
+                articleHtml += `<div class="eng-text">${paraText}</div>`;
+            }
+
+            articleHtml += `</div>`;
+        });
+
+        // ========== 右侧试题 ==========
+        let quizHtml = '';
+        quizHtml += `<div class="quiz-header">`;
+        quizHtml += `<h2>📝 阅读选择</h2>`;
+        quizHtml += `<div class="info-tags"><span>每题2分</span><span>共10分</span></div>`;
+        quizHtml += `</div>`;
+
+        exam.questions.forEach((q, qIdx) => {
+            const userAns = userAnswers[currentPage][qIdx];
+            const colorClass = `q-color-${(qIdx % 5) + 1}`;
+
+            quizHtml += `<div class="question-wrapper" id="wrapper-${qIdx}">`;
+            quizHtml += `<div class="match-item ${colorClass}" data-qid="${qIdx}">`;
+            quizHtml += `<div class="q-row"><span class="q-label">Q${qIdx + 1}</span><span class="q-text">${q.q}</span></div>`;
+            quizHtml += `<div class="options">`;
+            q.options.forEach((optText, optIdx) => {
+                const selectedClass = (userAns === optIdx) ? 'selected' : '';
+                const disabledClass = isSubmitted ? 'disabled' : '';
+                const letter = String.fromCharCode(65 + optIdx);
+                const hasPrefix = /^[A-D][\.\、\s]/.test(optText.trim());
+                const displayText = hasPrefix ? optText : `${letter}. ${optText}`;
+                quizHtml += `<div class="opt ${selectedClass} ${disabledClass}" data-qid="${qIdx}" data-opt="${optIdx}" onclick="selectOption(this, '${qIdx}', '${optIdx}')">${displayText}</div>`;
+            });
+            quizHtml += `</div></div>`;
+
+            quizHtml += `<div class="explain-inline ${colorClass}" id="explain-${qIdx}" style="display:none;"></div>`;
+            quizHtml += `</div>`;
+        });
+
+        // ========== 提交区 ==========
+        let submitAreaHtml = '';
+        if (!isSubmitted) {
+            submitAreaHtml += `<div class="submit-area">`;
+            submitAreaHtml += `<button class="submit-btn" id="submitBtn">提交答案</button>`;
+            submitAreaHtml += `<div class="score-box" id="scoreDisplay">得分：--</div>`;
+            submitAreaHtml += `</div>`;
+        } else {
+            submitAreaHtml += `<div class="submit-area">`;
+            submitAreaHtml += `<button class="submit-btn reset" id="resetBtn">重新作答</button>`;
+            submitAreaHtml += `<div class="score-box" id="scoreDisplay">得分：${score} / ${totalScore}</div>`;
+            submitAreaHtml += `</div>`;
+        }
+
+        // ========== 整体组装 ==========
+        const html = `
+            <h1>📘 阅读选择</h1>
+            <div class="subhead">
+                <span id="examInfo">${exam.session}真题</span>
+            </div>
+            <div class="main-panel">
+                <div class="left-col">
+                    <div class="article-card" id="articleCard">${articleHtml}</div>
+                </div>
+                <div class="right-col">
+                    <div class="quiz-card" id="quizCard">
+                        ${quizHtml}
+                        ${submitAreaHtml}
+                    </div>
+                </div>
+            </div>
+            <div class="pager-bottom">
+                <button id="prevBtn" ${currentPage === 0 ? 'disabled' : ''}>← 上一页</button>
+                <input type="number" id="pageInput" min="1" max="${examsData.length}" value="${currentPage + 1}" inputmode="numeric">
+                <button id="nextBtn" ${currentPage === examsData.length - 1 ? 'disabled' : ''}>下一页 →</button>
+            </div>
+            <div class="footnote">点击句子末尾图标可发音 · 左侧段落不同颜色区分 · 每题2分</div>
+        `;
+
+        app.innerHTML = html;
+
+        // 恢复音色选择
+        const voiceSelect = document.getElementById('voiceSelect');
+        if (voiceSelect) {
+            voiceSelect.value = loadVoicePreference();
+            voiceSelect.addEventListener('change', () => {
+                saveVoicePreference(voiceSelect.value);
+            });
+        }
+
+        bindEvents();
+        bindSpeakButtons();
+
+        if (highlightText) {
+            setTimeout(() => {
+                const el = document.querySelector('.highlight-source');
+                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+        }
+    }
+
+    // ========== 选项点击 ==========
+    window.selectOption = function(el, qIdx, optIdx) {
+        if (submitted[currentPage]) return;
+        const qIdxNum = parseInt(qIdx, 10);
+        const optIdxNum = parseInt(optIdx, 10);
+        userAnswers[currentPage][qIdxNum] = optIdxNum;
+        const parent = el.closest('.match-item');
+        if (parent) {
+            parent.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+        }
+        el.classList.add('selected');
+    };
+
+    // ========== 发音按钮绑定 ==========
+    function bindSpeakButtons() {
+        document.querySelectorAll('.speaker').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                // 在手势内同步解锁音频，避免 fetch 返回后 play() 被浏览器拦截
+                unlockAudio();
+                const text = decodeURIComponent(btn.dataset.text || '');
+                if (text) speakText(text, btn);
+            });
+        });
+    }
+
+    // ========== 事件绑定 ==========
+    function bindEvents() {
+        const exam = examsData[currentPage];
+
+        const transBtn = document.getElementById('translateBtn');
+        if (transBtn) {
+            transBtn.addEventListener('click', () => {
+                stopSpeech();
+                translateOn[currentPage] = !translateOn[currentPage];
+                render();
+            });
+        }
+
+        const submitBtn = document.getElementById('submitBtn');
+        if (submitBtn) {
+            submitBtn.addEventListener('click', () => {
+                let allAnswered = true;
+                for (let i = 0; i < exam.questions.length; i++) {
+                    if (userAnswers[currentPage][i] === null) { allAnswered = false; break; }
+                }
+                if (!allAnswered) { alert('请先完成所有题目再提交。'); return; }
+                submitted[currentPage] = true;
+                activeSourceIndex = null;
+                stopSpeech();
+                render();
+                exam.questions.forEach((q, qIdx) => {
+                    fillExplain(qIdx);
+                });
+            });
+        }
+
+        const resetBtn = document.getElementById('resetBtn');
+        if (resetBtn) {
+            resetBtn.addEventListener('click', () => {
+                exam.questions.forEach((_, idx) => { userAnswers[currentPage][idx] = null; });
+                submitted[currentPage] = false;
+                activeSourceIndex = null;
+                stopSpeech();
+                render();
+            });
+        }
+
+        const prevBtn = document.getElementById('prevBtn');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (currentPage > 0) goToPage(currentPage - 1);
+            });
+        }
+        const nextBtn = document.getElementById('nextBtn');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (currentPage < examsData.length - 1) goToPage(currentPage + 1);
+            });
+        }
+        const pageInput = document.getElementById('pageInput');
+        if (pageInput) {
+            const handleJump = () => {
+                let val = parseInt(pageInput.value, 10);
+                if (isNaN(val)) { pageInput.value = currentPage + 1; return; }
+                if (val < 1) val = 1;
+                if (val > examsData.length) val = examsData.length;
+                if (val - 1 === currentPage) { pageInput.value = currentPage + 1; return; }
+                goToPage(val - 1);
+            };
+            pageInput.addEventListener('blur', handleJump);
+            pageInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); handleJump(); pageInput.blur(); }
+            });
+            pageInput.addEventListener('focus', () => { pageInput.select(); });
+        }
+    }
+
+    // ========== 填充单题详解 ==========
+    function fillExplain(qIdx) {
+        const exam = examsData[currentPage];
+        const q = exam.questions[qIdx];
+        const userAns = userAnswers[currentPage][qIdx];
+        const isCorrect = userAns === q.answer;
+        const icon = isCorrect ? '✅' : '❌';
+        const correctLetter = String.fromCharCode(65 + q.answer);
+        const userLetter = userAns !== null ? String.fromCharCode(65 + userAns) : '未作答';
+        const explainDiv = document.getElementById(`explain-${qIdx}`);
+        if (!explainDiv) return;
+
+        let html = '';
+        html += `<div class="ans-line">`;
+        html += `<span class="ans-icon">${icon}</span>`;
+        html += `<span class="ans-tag">正确答案：${correctLetter}</span>`;
+        if (userAns !== null) {
+            html += `<span class="${isCorrect ? 'correct-answer' : 'wrong-answer'}">你的答案：${userLetter} ${isCorrect ? '✓' : '✗'}</span>`;
+        } else {
+            html += `<span class="wrong-answer">未作答</span>`;
+        }
+        html += `</div>`;
+        html += `<div class="ans-detail"><strong>解析：</strong>${q.explanation || '暂无解析'}</div>`;
+        if (q.sourceSentence) {
+            const isActive = activeSourceIndex === qIdx;
+            html += `<button class="source-btn ${isActive ? 'active' : ''}" data-qidx="${qIdx}">📍 ${isActive ? '取消来源' : '答案来源'}</button>`;
+        }
+        explainDiv.innerHTML = html;
+        explainDiv.style.display = 'block';
+
+        const sourceBtn = explainDiv.querySelector('.source-btn');
+        if (sourceBtn) {
+            sourceBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (activeSourceIndex === qIdx) {
+                    activeSourceIndex = null;
+                } else {
+                    activeSourceIndex = qIdx;
+                }
+                render();
+                examsData[currentPage].questions.forEach((_, idx) => fillExplain(idx));
+            });
+        }
+    }
+
+    // ========== 分页跳转 ==========
+    function goToPage(page) {
+        if (page < 0 || page >= examsData.length) return;
+        stopSpeech();
+        currentPage = page;
+        activeSourceIndex = null;
+        render();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // ========== 数据加载 ==========
+    function loadData() {
+        if (typeof exams === 'undefined' || !Array.isArray(exams)) {
+            app.innerHTML = '<div class="page-loading">❌ 题库数据加载失败，请检查 data.js</div>';
+            return;
+        }
+        examsData = exams;
+        initState();
+        render();
+    }
+
+    // ========== 讲解模式入口 ==========
+    function openLecture() {
+        const exam = examsData[currentPage];
+        if (!exam) { alert('题库数据未就绪'); return; }
+        if (!window.LectureCore || !window.LectureAdapter) { alert('讲解模式组件未加载'); return; }
+        if (typeof unlockAudio === 'function') { try { unlockAudio(); } catch (e) {} }
+        window.LectureCore.open(exam, {
+            onClose: function () { /* 关闭后无需重绘 */ }
+        });
+    }
+    window.openLecture = openLecture;
+
+    // iOS 微信音频解锁：页面加载后预播放一段极短的静音音频
+    function unlockIOSAudio() {
+        try {
+            const silent = new Audio('data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQAAAAA=');
+            silent.volume = 0;
+            silent.play().catch(() => {});
+        } catch (e) { /* 忽略 */ }
+    }
+
+    window.addEventListener('load', () => {
+        unlockIOSAudio();
+        setTimeout(loadData, 100);
+    });
+</script>
+<script src="lecture-adapter.js"></script>
+<!-- ===== 撷墨真题学习系统 · 外壳脚本（统一导航 + 期次同步） ===== -->
+<script src="../../_sys/catalog.js"></script>
+<script src="../../_sys/sys.js"></script>
+<script src="../../_sys/dict.js"></script>
+</body>
+</html>

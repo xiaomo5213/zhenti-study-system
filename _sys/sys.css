@@ -1,0 +1,259 @@
+/* ============================================================
+   撷墨 · 自考英语（专升本）真题学习系统 —— 全局外壳样式
+   ------------------------------------------------------------
+   作用：给 6 个独立题型页面注入统一的顶部导航栏 + 期次同步。
+   原则：只做「加法」，不修改各题型原有布局与配色。
+   z-index 取 900：低于各页面自己的弹窗（1000/2000）与讲解模式（9000），
+   因此在弹窗、讲解模式打开时本导航会自动被覆盖，不会串层。
+   ============================================================ */
+
+:root {
+    --xt-bar-h: 56px;
+    --xt-ink: #0f172a;
+    --xt-ink-2: #334155;
+    --xt-muted: #64748b;
+    --xt-line: #e2e8f0;
+    --xt-brand: #0f766e;
+    --xt-brand-2: #0ea5e9;
+    --xt-shadow: 0 2px 14px rgba(15, 23, 42, .07);
+}
+
+/* 用 !important 覆盖各页面自身的 body padding（16px / 12px 等），
+   避免导航栏压住页面顶部内容。 */
+html.xt-shell body {
+    padding-top: calc(var(--xt-bar-h) + 10px) !important;
+}
+
+/* zikao-test 的 .app-container 用了 min-height:100vh，扣掉导航高度防止出现无谓滚动条 */
+html.xt-shell .app-container {
+    min-height: calc(100vh - var(--xt-bar-h) - 10px) !important;
+}
+
+/* 各题型左侧材料卡是 position:sticky，固定导航出现后下移，避免被导航压住 */
+html.xt-shell .article-card {
+    top: calc(var(--xt-bar-h) + 20px) !important;
+}
+
+/* ---------------- 顶部导航栏 ---------------- */
+#xt-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--xt-bar-h);
+    z-index: 900;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, .94);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--xt-line);
+    box-shadow: var(--xt-shadow);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+        'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', sans-serif;
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--xt-ink);
+}
+
+#xt-bar *,
+#xt-bar *::before,
+#xt-bar *::after {
+    box-sizing: border-box;
+}
+
+/* 品牌区 */
+.xt-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+    text-decoration: none;
+    color: inherit;
+}
+
+.xt-mark {
+    width: 28px;
+    height: 28px;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    background: linear-gradient(135deg, var(--xt-brand), var(--xt-brand-2));
+    box-shadow: 0 3px 8px rgba(14, 165, 233, .28);
+    flex: none;
+}
+
+.xt-brand-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.15;
+}
+
+.xt-brand-text b {
+    font-size: 13.5px;
+    letter-spacing: .3px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.xt-brand-text span {
+    font-size: 10.5px;
+    color: var(--xt-muted);
+    white-space: nowrap;
+}
+
+/* 题型标签区 */
+.xt-tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 2px 0;
+}
+
+.xt-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.xt-tab {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    color: var(--xt-ink-2);
+    text-decoration: none;
+    font-size: 12.5px;
+    white-space: nowrap;
+    transition: background .16s, color .16s, border-color .16s;
+}
+
+.xt-tab .xt-tab-i {
+    font-size: 13px;
+    line-height: 1;
+}
+
+.xt-tab:hover {
+    background: #f1f5f9;
+    color: var(--xt-ink);
+}
+
+.xt-tab.is-active {
+    color: #fff;
+    background: var(--xt-accent, var(--xt-brand));
+    border-color: var(--xt-accent, var(--xt-brand));
+    font-weight: 600;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, .18);
+}
+
+/* 期次选择 */
+.xt-period {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 2px;
+}
+
+.xt-period label {
+    font-size: 11.5px;
+    color: var(--xt-muted);
+    white-space: nowrap;
+}
+
+#xt-period-select {
+    font: inherit;
+    font-size: 12.5px;
+    color: var(--xt-ink);
+    background: #fff;
+    border: 1px solid var(--xt-line);
+    border-radius: 8px;
+    padding: 5px 6px;
+    max-width: 152px;
+    cursor: pointer;
+    outline: none;
+}
+
+#xt-period-select:focus {
+    border-color: var(--xt-brand-2);
+    box-shadow: 0 0 0 3px rgba(14, 165, 233, .16);
+}
+
+/* 首页按钮 */
+.xt-home {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 7px 12px;
+    border-radius: 9px;
+    border: 1px solid var(--xt-line);
+    background: #fff;
+    color: var(--xt-ink);
+    text-decoration: none;
+    font-size: 12.5px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: background .16s, border-color .16s, transform .16s;
+}
+
+.xt-home:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.xt-home:active {
+    transform: translateY(1px);
+}
+
+/* ---------------- 移动端：两行布局 ---------------- */
+@media (max-width: 860px) {
+    :root {
+        --xt-bar-h: 94px;
+    }
+
+    #xt-bar {
+        flex-wrap: wrap;
+        align-content: center;
+        gap: 6px 8px;
+        padding: 7px 10px;
+    }
+
+    .xt-tabs {
+        order: 3;
+        width: 100%;
+        flex: 1 1 100%;
+    }
+
+    .xt-period {
+        margin-left: auto;
+    }
+
+    .xt-brand-text span {
+        display: none;
+    }
+
+    #xt-period-select {
+        max-width: 118px;
+    }
+
+    .xt-home span {
+        display: none;
+    }
+
+    .xt-home {
+        padding: 7px 10px;
+    }
+}
