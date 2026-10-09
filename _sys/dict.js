@@ -331,7 +331,11 @@
     /* ---------------- 弹窗 UI ---------------- */
     var pop = null, mask = null, card = null;
     var curWord = '', curAnchor = null, curResult = null, curCtx = null;
-    var WB_URL = '../wordbook.html';
+    // 生词本页地址（相对路径）：模块页固定在 /modules/<题型>/ 两级下，故回退两级到站点根。
+    // GitHub Pages 挂在子路径（/仓库名/）下时，相对路径同样正确。
+    var WB_URL = /\/(modules\/[^/]+\/)/.test(location.pathname)
+        ? '../../wordbook.html'
+        : './wordbook.html';
 
     function isMobile() {
         return window.matchMedia && window.matchMedia('(max-width: 760px)').matches;
@@ -357,14 +361,6 @@
             if (snd) {
                 playWord(curWord, snd.getAttribute('data-type'));
                 markPlaying(snd);
-                return;
-            }
-            var exs = e.target.closest('.xt-dict-ex-snd');
-            if (exs) {
-                if (curCtx && curCtx.sent) {
-                    playUrl(CFG.voice + '?audio=' + encodeURIComponent(curCtx.sent) + '&type=2');
-                    markPlaying(exs);
-                }
                 return;
             }
             var add = e.target.closest('.xt-dict-add');
@@ -520,12 +516,11 @@
 
     function ctxHtml(ctx, word) {
         if (!ctx || !ctx.sent) return '';
-        var h = '<div class="xt-dict-sec"><div class="xt-dict-sec-t">📌 原文例句' +
-            '<button class="xt-dict-ex-snd" title="朗读例句">🔊</button></div>' +
-            '<div class="xt-dict-ex">' + hlWord(ctx.sent, word) + '</div>';
-        if (ctx.zh) h += '<div class="xt-dict-ex-zh">' + esc(ctx.zh) + '</div>';
-        h += '</div>';
-        return h;
+        // 按要求：例句只做展示，不提供朗读（发音仅保留单词的英音/美音）
+        return '<div class="xt-dict-sec"><div class="xt-dict-sec-t">📌 原文例句</div>' +
+            '<div class="xt-dict-ex">' + hlWord(ctx.sent, word) + '</div>' +
+            (ctx.zh ? '<div class="xt-dict-ex-zh">' + esc(ctx.zh) + '</div>' : '') +
+            '</div>';
     }
 
     function renderLoading(word) {

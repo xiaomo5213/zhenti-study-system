@@ -278,31 +278,6 @@ html.xt-shell .xt-w.is-active {
     line-height: 1.65;
 }
 
-/* 例句朗读小按钮 */
-.xt-dict-ex-snd {
-    margin-left: auto;
-    border: none;
-    background: none;
-    color: #9fb2c6;
-    font-size: .82rem;
-    cursor: pointer;
-    padding: 1px 4px;
-    border-radius: 6px;
-    line-height: 1;
-    transition: all .15s;
-    font-family: inherit;
-}
-
-.xt-dict-ex-snd:hover {
-    color: #2d5f92;
-    background: #eef3fb;
-}
-
-.xt-dict-ex-snd.playing {
-    color: #fff;
-    background: #0f766e;
-}
-
 /* ---------- 状态 ---------- */
 .xt-dict-loading {
     display: flex;
